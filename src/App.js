@@ -9,17 +9,25 @@ function App() {
   useEffect(() => {
     // Vérification que BoondManager est disponible
     if (window.BoondManager) {
+      console.log('BoondManager loaded:', window.BoondManager);  // Vérification que BoondManager est chargé
+
       // Initialisation de BoondManager
       window.BoondManager.init({
         targetOrigin: '*'
       })
         .then(() => {
+          console.log('BoondManager initialized');  // Confirmation que l'initialisation s'est bien passée
+
           // Redimensionnement automatique
           window.BoondManager.setAutoResize();
-          // Récupération des informations de l'utilisateur courant
+
+          // Appel API pour récupérer les informations de l'utilisateur courant
           return window.BoondManager.callApi('application/current-user');
         })
         .then((response) => {
+          console.log('User response:', response);  // Vérification de la réponse utilisateur
+
+          // Traitement des données si elles existent
           if (response && response.data && response.data.attributes) {
             const { firstName, lastName } = response.data.attributes;
             setUserInfo({ firstName, lastName });

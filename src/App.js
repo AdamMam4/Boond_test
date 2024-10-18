@@ -5,20 +5,22 @@ import './App.css';
 function App() {
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState(null);
-  const clientToken = process.env.REACT_APP_CLIENT_TOKEN; // Récupérer le token depuis .env
 
   useEffect(() => {
     // Vérification que BoondManager est disponible
     if (window.BoondManager) {
-      console.log('BoondManager loaded:', window.BoondManager);  // Vérification que BoondManager est chargé
+      console.log('BoondManager loaded:', window.BoondManager);
 
-      // Initialisation de BoondManager avec le clientToken
+      // Initialisation de BoondManager avec les variables d'environnement
+      const appKey = process.env.REACT_APP_APP_KEY;
+      const appReference = process.env.REACT_APP_APP_REFERENCE;
+      const appCode = process.env.REACT_APP_APP_CODE;
+
       window.BoondManager.init({
-        targetOrigin: '*',
-        appToken: clientToken // Ajout du token dans l'init
+        targetOrigin: '*'
       })
         .then(() => {
-          console.log('BoondManager initialized');  // Confirmation que l'initialisation s'est bien passée
+          console.log('BoondManager initialized');
 
           // Redimensionnement automatique
           window.BoondManager.setAutoResize();
@@ -27,7 +29,7 @@ function App() {
           return window.BoondManager.callApi('application/current-user');
         })
         .then((response) => {
-          console.log('User response:', response);  // Vérification de la réponse utilisateur
+          console.log('User response:', response);
 
           // Traitement des données si elles existent
           if (response && response.data && response.data.attributes) {
@@ -44,7 +46,7 @@ function App() {
     } else {
       setError('BoondManager non disponible.');
     }
-  }, [clientToken]);
+  }, []);
 
   return (
     <div className="App">

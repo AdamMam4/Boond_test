@@ -5,15 +5,17 @@ import './App.css';
 function App() {
   const [userInfo, setUserInfo] = useState(null);
   const [error, setError] = useState(null);
+  const clientToken = process.env.REACT_APP_CLIENT_TOKEN; // Récupérer le token depuis .env
 
   useEffect(() => {
     // Vérification que BoondManager est disponible
     if (window.BoondManager) {
       console.log('BoondManager loaded:', window.BoondManager);  // Vérification que BoondManager est chargé
 
-      // Initialisation de BoondManager
+      // Initialisation de BoondManager avec le clientToken
       window.BoondManager.init({
-        targetOrigin: '*'
+        targetOrigin: '*',
+        appToken: clientToken // Ajout du token dans l'init
       })
         .then(() => {
           console.log('BoondManager initialized');  // Confirmation que l'initialisation s'est bien passée
@@ -42,7 +44,7 @@ function App() {
     } else {
       setError('BoondManager non disponible.');
     }
-  }, []);
+  }, [clientToken]);
 
   return (
     <div className="App">

@@ -1,51 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import jwtDecode from 'jsonwebtoken'; // Importation de jsonwebtoken
-import { Buffer } from 'buffer';
-window.Buffer = Buffer;
+import logo from './logo.svg';
+import './App.css';
 
-import crypto from 'crypto-browserify';
-window.crypto = crypto;
+function App() {
+  const [userInfo, setUserInfo] = useState(null);
+  const [error, setError] = useState(null);
 
-import stream from 'stream-browserify';
-window.stream = stream;
+  useEffect(() => {
+    // Vérification que BoondManager est disponible
+    if (window.BoondManager) {
+      console.log('BoondManager loaded:', window.BoondManager);  // Vérification que BoondManager est chargé
 
-const App = () => {
-  const [appKey, setAppKey] = useState('');
-  const [appReference, setAppReference] = useState('');
-  const [appCode, setAppCode] = useState('');
+      // Initialisation de BoondManager
+      window.BoondManager.init({
+        targetOrigin: '*'
+      })
+        .then(() => {
+          console.log('BoondManager initialized');  // Confirmation que l'initialisation s'est bien passée
 
-  // Simule la récupération d'un signedRequest
-  const getSignedRequest = () => {
-    const signedRequest = 'exemple.signed.request.jwt'; // Remplacez par la récupération réelle du signedRequest
-    console.log("Signed Request reçu:", signedRequest);
-    return signedRequest;
-  };
+          // Redimensionnement automatique
+          window.BoondManager.setAutoResize();
 
-  // Fonction pour décoder en toute sécurité le signedRequest
-  const decodeSignedRequest = (signedRequest, secretKey) => {
-    try {
-      const decoded = jwtDecode(signedRequest, secretKey); // Décodage sécurisé du JWT
-      console.log("Données décodées:", decoded);
-      return decoded;
-    } catch (error) {
-      console.error('Erreur lors du décodage de la requête signée:', error);
-      return null;
-    }
-  };
+          // Appel API pour récupérer les informations de l'utilisateur courant
+          return window.BoondManager.callApi('application/current-user');
+        })
+        .then((response) => {
+          console.log('User response:', response);  // Vérification de la réponse utilisateur
 
-  useEffect(() => { 
-    // Appel pour obtenir le signedRequest
-    const signedRequest = getSignedRequest();
-
-    // Décodage du signedRequest
-    const secretKey = 'votre_clé_secrète'; // Clé secrète utilisée pour signer le JWT
-    const decodedRequest = decodeSignedRequest(signedRequest, secretKey);
-
-    // Si le décodage a réussi, mettez à jour les états avec les valeurs extraites
-    if (decodedRequest) {
-      setAppKey(decodedRequest.appKey || '');
-      setAppReference(decodedRequest.appReference || '');
-      setAppCode(decodedRequest.appCode || '');
+          // Traitement des données si elles existent
+          if (response && response.data && response.data.attributes) {
+            const { firstName, lastName } = response.data.attributes;
+            setUserInfo({ firstName, lastName });
+          } else {
+            throw new Error('User data unavailable');
+          }
+        })
+        .catch((err) => {
+          console.error('BoondManager init error:', err);
+          setError('Erreur lors de l\'initialisation de BoondManager.');
+        });
+    } else {
+      setError('BoondManager non disponible.');
     }
   }, []);
 

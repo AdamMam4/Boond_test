@@ -11,6 +11,7 @@ function App() {
     if (window.BoondManager) {
       console.log('BoondManager loaded:', window.BoondManager);  // Vérification que BoondManager est chargé
 
+<<<<<<< HEAD
       // Initialisation de BoondManager
       window.BoondManager.init({
         targetOrigin: '*'
@@ -50,6 +51,70 @@ function App() {
       <p><strong>App Key:</strong> {appKey}</p>
       <p><strong>App Reference:</strong> {appReference}</p>
       <p><strong>App Code:</strong> {appCode}</p>
+=======
+      // Initialisation de BoondManager avec les variables d'environnement
+      const appKey = process.env.REACT_APP_APP_KEY;
+      const appReference = process.env.REACT_APP_APP_REFERENCE;
+      const appCode = process.env.REACT_APP_APP_CODE;
+
+      window.BoondManager.init({
+        targetOrigin: '*'
+      })
+        .then(() => {
+          console.log('BoondManager initialized');
+
+          // Redimensionnement automatique
+          window.BoondManager.setAutoResize();
+
+          // Appel API pour récupérer les informations de l'utilisateur courant
+          return window.BoondManager.callApi('application/current-user');
+        })
+        .then((response) => {
+          console.log('User response:', response);
+
+          // Traitement des données si elles existent
+          if (response && response.data && response.data.attributes) {
+            const { firstName, lastName } = response.data.attributes;
+            setUserInfo({ firstName, lastName });
+          } else {
+            throw new Error('User data unavailable');
+          }
+        })
+        .catch((err) => {
+          console.error('BoondManager init error:', err);
+          setError('Erreur lors de l\'initialisation de BoondManager.');
+        });
+    } else {
+      setError('BoondManager non disponible.');
+    }
+  }, []);
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+        {/* Afficher les informations de l'utilisateur si disponibles */}
+        {userInfo ? (
+          <div>
+            <h1>Hello {userInfo.firstName} {userInfo.lastName}</h1>
+            <p>Bienvenue dans l'application React intégrée avec BoondManager !</p>
+          </div>
+        ) : (
+          error ? <p>{error}</p> : <p>Chargement des informations utilisateur...</p>
+        )}
+      </header>
+>>>>>>> parent of f80fb8c (test)
     </div>
   );
 };
